@@ -26,11 +26,23 @@ export default function Journey() {
   const [pathway, setPathway] = useState<Pathway | null>(null);
   const [loadingStep, setLoadingStep] = useState(0);
   const [error, setError] = useState("");
+  const [profile, setProfile] = useState<any | null>(null);
+  const [history, setHistory] = useState<string[]>([]);
   const loadingTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const selected = getTransition(selectedId);
 
   useEffect(() => {
+    try {
+      const raw = localStorage.getItem("hernext:profile");
+      if (raw) {
+        const p = JSON.parse(raw);
+        setProfile(p);
+        setHistory(p.history || []);
+      }
+    } catch {
+      /* ignore */
+    }
     return () => {
       if (loadingTimer.current) clearInterval(loadingTimer.current);
     };
@@ -86,6 +98,21 @@ export default function Journey() {
       }
       setPathway(data.pathway);
       setStep("result");
+      // Persist the profile + journey history — this is the continuity/moat layer.
+      try {
+        const t = getTransition(ctx.transitionId);
+        const chip = t?.chip || ctx.transitionId;
+        setHistory((prev) => {
+          const h = prev[prev.length - 1] === chip ? prev : [...prev, chip];
+          localStorage.setItem(
+            "hernext:profile",
+            JSON.stringify({ ...ctx, history: h, updatedAt: new Date().toISOString() })
+          );
+          return h;
+        });
+      } catch {
+        /* ignore */
+      }
     } catch (e: any) {
       if (loadingTimer.current) clearInterval(loadingTimer.current);
       setError(e.message || "Something went wrong.");
@@ -117,6 +144,43 @@ export default function Journey() {
       age,
       timeline,
       details: merged,
+    });
+  }
+
+  // Resume the saved journey (continuity across sessions).
+  function resume() {
+    if (!profile) return;
+    const t = getTransition(profile.transitionId);
+    if (!t) return;
+    setSelectedId(profile.transitionId);
+    setGoal(profile.goal || "");
+    setAge(profile.age || "");
+    setTimeline(profile.timeline || "");
+    setDetails(profile.details || "");
+    submit({
+      transitionId: profile.transitionId,
+      transitionPhrase: t.whatsChanging,
+      goal: profile.goal || "",
+      age: profile.age || "",
+      timeline: profile.timeline || "",
+      details: profile.details || "",
+    });
+  }
+
+  // Advance to the natural next life stage, carrying everything she's shared forward.
+  function advanceStage() {
+    if (!selected?.next) return;
+    const t = getTransition(selected.next.id);
+    if (!t) return;
+    setSelectedId(t.id);
+    setGoal(t.goalSuggestions[0] || "");
+    submit({
+      transitionId: t.id,
+      transitionPhrase: t.whatsChanging,
+      goal: t.goalSuggestions[0] || "",
+      age,
+      timeline,
+      details,
     });
   }
 
@@ -160,6 +224,17 @@ export default function Journey() {
         {/* STEP 1 — What's changing */}
         {step === "select" && (
           <section className="stepper">
+            {profile && getTransition(profile.transitionId) && (
+              <div className="resume-banner">
+                <div>
+                  <strong>Welcome back.</strong> You were navigating{" "}
+                  {getTransition(profile.transitionId)?.chip}.
+                </div>
+                <button className="btn btn-ghost" onClick={resume}>
+                  Continue where I left off →
+                </button>
+              </div>
+            )}
             <div className="step-label">Step 1 of 2</div>
             <h2 className="step-q">What's changing in your life?</h2>
             <p className="step-hint">
@@ -278,6 +353,11 @@ export default function Journey() {
       {/* RESULT — wider container */}
       {step === "result" && pathway && selected && (
         <div className="wrap">
+          {history.length > 1 && (
+            <div className="journey-bread">
+              Your journey: {history.join("  →  ")}
+            </div>
+          )}
           <PathwayView
             pathway={pathway}
             stages={selected.stages}
@@ -285,6 +365,21 @@ export default function Journey() {
             transitionId={selected.id}
             onRefine={refine}
           />
+
+          {selected.next && (
+            <div className="continue-panel">
+              <div className="cp-tag">The journey continues</div>
+              <h3>What happens next?</h3>
+              <p>
+                HerNext remembers you. Move to your next life stage and your plan carries
+                everything you've already shared, with no re-entry. This is why women stay
+                for years, not one appointment.
+              </p>
+              <button className="btn btn-primary" onClick={advanceStage}>
+                {selected.next.label}
+              </button>
+            </div>
+          )}
 
           <div className="replatform">
             <h3>The same engine, a different transition.</h3>

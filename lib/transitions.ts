@@ -207,6 +207,8 @@ export interface Transition {
   // What the user picks on the onboarding screen: a life change, not a condition.
   whatsChanging: string;
   chip: string; // short tag shown on the option card
+  // The natural next transition in the journey (drives the continuity / "advance" feature).
+  next?: { id: string; label: string };
   goalSuggestions: string[];
   // The pathway map nodes; youAreHere marks the highlighted node.
   stages: TransitionStage[];
@@ -231,6 +233,7 @@ export const TRANSITIONS: Transition[] = [
   // -------------------------------------------------------------------------
   {
     id: "pcos-fertility",
+    next: {"id":"pregnancy-postpartum","label":"I got a positive test → plan my pregnancy & beyond"},
     whatsChanging: "I have PCOS and I'm thinking about getting pregnant",
     chip: "PCOS → Pregnancy planning",
     goalSuggestions: ["Prepare for pregnancy", "Understand my fertility", "Come off birth control safely"],
@@ -359,6 +362,7 @@ export const TRANSITIONS: Transition[] = [
   // -------------------------------------------------------------------------
   {
     id: "contraception-pregnancy",
+    next: {"id":"pregnancy-postpartum","label":"I got a positive test → plan my pregnancy & beyond"},
     whatsChanging: "I'm on birth control and want to start trying",
     chip: "Contraception → Pregnancy planning",
     goalSuggestions: ["Come off birth control safely", "Prepare for pregnancy", "Understand my cycle"],
@@ -473,6 +477,7 @@ export const TRANSITIONS: Transition[] = [
   // -------------------------------------------------------------------------
   {
     id: "pregnancy-postpartum",
+    next: {"id":"postpartum-contraception","label":"After birth → plan recovery & contraception"},
     whatsChanging: "I'm pregnant and thinking about after the birth",
     chip: "Pregnancy → Postpartum",
     goalSuggestions: ["Prepare for recovery", "Plan postpartum support", "Understand warning signs"],
@@ -583,6 +588,7 @@ export const TRANSITIONS: Transition[] = [
   // -------------------------------------------------------------------------
   {
     id: "trying-difficulty",
+    next: {"id":"pregnancy-postpartum","label":"I got a positive test → plan my pregnancy & beyond"},
     whatsChanging: "I've been trying and it hasn't happened yet",
     chip: "Trying → Fertility support",
     goalSuggestions: ["Know when to get help", "Understand my options"],
@@ -770,6 +776,7 @@ export const TRANSITIONS: Transition[] = [
   // -------------------------------------------------------------------------
   {
     id: "postpartum-contraception",
+    next: {"id":"contraception-pregnancy","label":"Thinking about another baby → plan again"},
     whatsChanging: "I just had a baby and I'm thinking about birth control",
     chip: "Postpartum → Contraception",
     goalSuggestions: ["Choose a birth-control method", "Space my next pregnancy", "Understand breastfeeding-safe options"],

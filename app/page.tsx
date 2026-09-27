@@ -8,9 +8,14 @@ export default function Home() {
           <Link href="/" className="brand">
             Her<span className="dot">Next</span>
           </Link>
-          <Link href="/journey" className="nav-link">
-            Start my journey →
-          </Link>
+          <span>
+            <Link href="/business" className="nav-link" style={{ marginRight: 20 }}>
+              For employers
+            </Link>
+            <Link href="/journey" className="nav-link">
+              Start my journey →
+            </Link>
+          </span>
         </nav>
 
         <section className="hero">

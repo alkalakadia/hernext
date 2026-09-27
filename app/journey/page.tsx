@@ -105,6 +105,21 @@ export default function Journey() {
     });
   }
 
+  // Answer a gap → append it to details and rebuild the plan live.
+  function refine(extra: string) {
+    if (!selected) return;
+    const merged = [details, extra].filter(Boolean).join(". ");
+    setDetails(merged);
+    submit({
+      transitionId: selected.id,
+      transitionPhrase: selected.whatsChanging,
+      goal: goal || selected.goalSuggestions[0] || "",
+      age,
+      timeline,
+      details: merged,
+    });
+  }
+
   // Switch transitions from the result view (the "this is a platform" moment).
   function switchTransition(id: string) {
     const t = getTransition(id);
@@ -267,6 +282,8 @@ export default function Journey() {
             pathway={pathway}
             stages={selected.stages}
             youAreHere={selected.youAreHere}
+            transitionId={selected.id}
+            onRefine={refine}
           />
 
           <div className="replatform">

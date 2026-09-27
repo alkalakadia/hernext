@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getTransition, resolveSources } from "@/lib/transitions";
 import { buildSystemPrompt, buildUserMessage, PATHWAY_SCHEMA } from "@/lib/prompt";
 import { generatePathway, hasApiKey } from "@/lib/claude";
+import { buildMockPathway } from "@/lib/mockEngine";
 import type { Pathway, UserContext } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -55,11 +56,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unknown transition." }, { status: 400 });
   }
 
-  const demoPathway: Pathway = { ...transition.demo, generatedBy: "demo" };
+  // Personalized, deterministic pathway built from the user's inputs — no API needed.
+  const mockPathway: Pathway = buildMockPathway(transition, ctx);
 
-  // No key: serve the curated pathway so the demo always works offline.
+  // No key: serve the personalized mock pathway so the demo always works offline.
   if (!hasApiKey()) {
-    return NextResponse.json({ pathway: demoPathway, mode: "demo" });
+    return NextResponse.json({ pathway: mockPathway, mode: "demo" });
   }
 
   try {
@@ -70,8 +72,8 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ pathway: assemble(raw), mode: "ai" });
   } catch (err) {
-    console.error("Pathway generation failed, serving curated fallback:", err);
-    // Never fail the demo: fall back to curated content.
-    return NextResponse.json({ pathway: demoPathway, mode: "demo-fallback" });
+    console.error("Pathway generation failed, serving personalized fallback:", err);
+    // Never fail the demo: fall back to the personalized mock pathway.
+    return NextResponse.json({ pathway: mockPathway, mode: "demo-fallback" });
   }
 }

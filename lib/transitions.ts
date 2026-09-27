@@ -143,6 +143,54 @@ export const SOURCES: Record<string, Source> = {
     date: "2023",
     relevance: "What perimenopause is and what changes to expect in the transition.",
   },
+  "cdc-alcohol": {
+    id: "cdc-alcohol",
+    title: "Alcohol Use During Pregnancy",
+    org: "CDC",
+    url: "https://www.cdc.gov/alcohol-pregnancy/about/index.html",
+    date: "Reviewed 2024",
+    relevance: "There is no known safe amount of alcohol when trying to conceive or pregnant.",
+  },
+  "cdc-tobacco": {
+    id: "cdc-tobacco",
+    title: "Smoking During and After Pregnancy",
+    org: "CDC",
+    url: "https://www.cdc.gov/tobacco/campaign/tips/diseases/pregnancy.html",
+    date: "Reviewed 2024",
+    relevance: "Stopping smoking before conception measurably improves pregnancy outcomes.",
+  },
+  "acog-thyroid": {
+    id: "acog-thyroid",
+    title: "Thyroid Disease FAQ",
+    org: "ACOG",
+    url: "https://www.acog.org/womens-health/faqs/thyroid-disease",
+    date: "Reviewed 2022",
+    relevance: "Thyroid conditions and medication doses are best optimized before and during pregnancy.",
+  },
+  "cdc-diabetes-pregnancy": {
+    id: "cdc-diabetes-pregnancy",
+    title: "Diabetes Before, During, and After Pregnancy",
+    org: "CDC",
+    url: "https://www.cdc.gov/diabetes/about/diabetes-and-pregnancy.html",
+    date: "Reviewed 2024",
+    relevance: "Blood-sugar control before conception lowers the risk of pregnancy complications.",
+  },
+  "acog-weight": {
+    id: "acog-weight",
+    title: "Obesity and Pregnancy FAQ",
+    org: "ACOG",
+    url: "https://www.acog.org/womens-health/faqs/obesity-and-pregnancy",
+    date: "Reviewed 2023",
+    relevance: "Weight and metabolic health are common, sensitive parts of PCOS and preconception care.",
+  },
+  "acog-mental-health": {
+    id: "acog-mental-health",
+    title: "Mental Health Conditions and Pregnancy",
+    org: "ACOG",
+    url: "https://www.acog.org/womens-health/faqs/depression-and-pregnancy",
+    date: "Reviewed 2023",
+    relevance: "Mental-health medications should be reviewed with a clinician, not stopped abruptly.",
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -548,26 +596,54 @@ export const TRANSITIONS: Transition[] = [
     relevantSourceIds: ["asrm-infertility", "asrm-ovulation", "cdc-preconception"],
     grounding:
       "The standard threshold for a fertility evaluation is 12 months of trying (or 6 months if age 35+), and earlier with known risk factors like irregular cycles. This is navigation toward evaluation, not diagnosis.",
-    status: "preview",
+    status: "ready",
     demo: {
       transitionLabel: "Trying → Fertility Support",
       currentStage: "Trying to conceive",
       stageStatus: "Considering next steps",
       goal: "Understand when and how to get support",
       summary:
-        "This transition is a preview built on the same engine. It points you toward the right timeline for a fertility evaluation.",
+        "You've been trying, and it hasn't happened yet. That's common and it doesn't mean something is wrong. The next step is knowing the right timeline for an evaluation and getting the most out of that first appointment.",
       roadmap: [
         {
           phase: "NOW",
           subtitle: "Understand the timeline",
           items: [
             {
-              text: "Know the evaluation thresholds: about 12 months of trying, or 6 months if you're 35 or older.",
+              text: "Know the evaluation thresholds: about 12 months of trying, or 6 months if you're 35 or older, and sooner with known risk factors like irregular cycles.",
               sourceIds: ["asrm-infertility"],
             },
             {
-              text: "Confirm you're timing intercourse to your fertile window.",
+              text: "Double-check that you're timing intercourse to your fertile window, since mistimed cycles are a common and fixable reason.",
               sourceIds: ["asrm-ovulation"],
+            },
+            {
+              text: "Keep taking folic acid while you continue trying.",
+              sourceIds: ["cdc-folic-acid"],
+            },
+          ],
+        },
+        {
+          phase: "BEFORE THE VISIT",
+          subtitle: "Come prepared",
+          items: [
+            {
+              text: "Track your cycle length and any symptoms so you can describe the pattern to your clinician.",
+              sourceIds: ["asrm-ovulation"],
+            },
+            {
+              text: "Remember an evaluation looks at both partners, so plan for that conversation together.",
+              sourceIds: ["asrm-infertility"],
+            },
+          ],
+        },
+        {
+          phase: "AT THE EVALUATION",
+          subtitle: "What to expect",
+          items: [
+            {
+              text: "Initial testing often checks ovulation, hormone levels, and other basics, then options are discussed from there.",
+              sourceIds: ["asrm-infertility"],
             },
           ],
         },
@@ -578,14 +654,23 @@ export const TRANSITIONS: Transition[] = [
           rationale: "Thresholds shift with age and risk factors.",
           sourceIds: ["asrm-infertility"],
         },
+        {
+          question: "How can I confirm whether and when I'm ovulating?",
+          rationale: "Ovulation is the most common single factor in timing.",
+          sourceIds: ["asrm-ovulation"],
+        },
       ],
       informationGaps: [
         {
           gap: "We don't know your age or how long you've been trying.",
           whyItMatters: "Both determine whether an evaluation is recommended yet.",
         },
+        {
+          gap: "We don't know whether your cycles are regular.",
+          whyItMatters: "Irregular cycles can justify an earlier evaluation.",
+        },
       ],
-      sources: resolve(["asrm-infertility", "asrm-ovulation", "cdc-preconception"]),
+      sources: resolve(["asrm-infertility", "asrm-ovulation", "cdc-preconception", "cdc-folic-acid"]),
       disclaimer:
         "HerNext is a navigation tool, not medical advice or diagnosis. It helps you prepare for the conversation with your healthcare provider.",
     },
@@ -604,25 +689,49 @@ export const TRANSITIONS: Transition[] = [
     relevantSourceIds: ["nice-menopause", "menopause-society"],
     grounding:
       "Perimenopause is the transition before menopause, marked by cycle and symptom changes. Navigation covers understanding symptoms and knowing that evidence-based treatment options exist to discuss with a clinician.",
-    status: "preview",
+    status: "ready",
     demo: {
       transitionLabel: "Perimenopause → Menopause",
       currentStage: "Perimenopause",
       stageStatus: "Understanding the change",
       goal: "Understand what's happening and what my options are",
       summary:
-        "This transition is a preview built on the same engine. It helps you make sense of perimenopausal changes and prepare to discuss options.",
+        "The changes you're noticing may be perimenopause, the transition before menopause. It can last years and the symptoms are real and treatable. The goal now is to understand what's happening and walk into your appointment knowing your options.",
       roadmap: [
         {
           phase: "NOW",
           subtitle: "Make sense of the change",
           items: [
             {
-              text: "Learn what perimenopause is and which symptoms are commonly part of it.",
+              text: "Learn what perimenopause is and which symptoms (cycle changes, hot flashes, sleep and mood shifts) are commonly part of it.",
               sourceIds: ["menopause-society"],
             },
             {
-              text: "Know that evidence-based treatment options exist and can be discussed with a clinician.",
+              text: "Start a simple symptom and cycle log so patterns are clear when you talk to a clinician.",
+              sourceIds: ["menopause-society"],
+            },
+          ],
+        },
+        {
+          phase: "OPTIONS TO DISCUSS",
+          subtitle: "What can help",
+          items: [
+            {
+              text: "Know that evidence-based options exist, from lifestyle approaches to hormonal and non-hormonal treatments, and are worth discussing.",
+              sourceIds: ["nice-menopause"],
+            },
+            {
+              text: "Ask which approach fits your symptoms and health history rather than assuming one path.",
+              sourceIds: ["nice-menopause"],
+            },
+          ],
+        },
+        {
+          phase: "LOOKING AHEAD",
+          subtitle: "Longer-term health",
+          items: [
+            {
+              text: "The menopause transition is a good time to check in on bone and heart health with your clinician.",
               sourceIds: ["nice-menopause"],
             },
           ],
@@ -634,16 +743,115 @@ export const TRANSITIONS: Transition[] = [
           rationale: "Symptoms overlap with other conditions; a clinician can help sort them out.",
           sourceIds: ["nice-menopause", "menopause-society"],
         },
+        {
+          question: "Given my health history, which treatment options are and aren't a good fit for me?",
+          rationale: "The right option depends on your personal risk profile.",
+          sourceIds: ["nice-menopause"],
+        },
       ],
       informationGaps: [
         {
           gap: "We don't know your specific symptoms or health history.",
           whyItMatters: "Both shape which options are appropriate to consider.",
         },
+        {
+          gap: "We don't know whether your periods have changed or stopped.",
+          whyItMatters: "This helps place you in the transition and guides what to discuss.",
+        },
       ],
       sources: resolve(["nice-menopause", "menopause-society"]),
       disclaimer:
         "HerNext is a navigation tool, not medical advice or diagnosis. It helps you prepare for the conversation with your healthcare provider.",
+    },
+  },
+
+  // -------------------------------------------------------------------------
+  // 6. Postpartum -> Contraception  (completes the journey loop)
+  // -------------------------------------------------------------------------
+  {
+    id: "postpartum-contraception",
+    whatsChanging: "I just had a baby and I'm thinking about birth control",
+    chip: "Postpartum → Contraception",
+    goalSuggestions: ["Choose a birth-control method", "Space my next pregnancy", "Understand breastfeeding-safe options"],
+    stages: [
+      { key: "postpartum", label: "Postpartum" },
+      { key: "contraception", label: "Contraception choice" },
+      { key: "spacing", label: "Birth spacing" },
+      { key: "future", label: "Future planning" },
+    ],
+    youAreHere: 0,
+    relevantSourceIds: ["acog-birth-spacing", "cdc-mec", "cdc-contraception-return", "acog-postpartum"],
+    grounding:
+      "Fertility can return before the first postpartum period, so contraception is worth deciding on early. Method choice depends on timing after birth and whether she is breastfeeding (the CDC Medical Eligibility Criteria guide method safety). Birth-spacing guidance informs the interval before a next pregnancy. This is navigation toward a method conversation, not a prescription.",
+    status: "ready",
+    demo: {
+      transitionLabel: "Postpartum → Contraception",
+      currentStage: "Postpartum",
+      stageStatus: "Choosing what's next",
+      goal: "Choose a birth-control method that fits this season",
+      summary:
+        "You've just had a baby, and fertility can return before your first period. The next step is choosing a contraception approach that fits your body right now, your feeding choices, and how you're thinking about spacing.",
+      roadmap: [
+        {
+          phase: "NOW",
+          subtitle: "Decide sooner than you might expect",
+          items: [
+            {
+              text: "Know that fertility can return before your first postpartum period, so it's worth deciding on contraception early.",
+              sourceIds: ["cdc-contraception-return"],
+            },
+            {
+              text: "If you're breastfeeding, ask which methods are recommended and when each can be started.",
+              sourceIds: ["cdc-mec", "acog-birth-spacing"],
+            },
+          ],
+        },
+        {
+          phase: "CHOOSING A METHOD",
+          subtitle: "Match the method to your situation",
+          items: [
+            {
+              text: "Method safety depends on how long it's been since birth and your health history; your clinician can use the eligibility criteria with you.",
+              sourceIds: ["cdc-mec"],
+            },
+          ],
+        },
+        {
+          phase: "LOOKING AHEAD",
+          subtitle: "If you may want another child",
+          items: [
+            {
+              text: "Discuss recommended birth spacing so your method choice matches your plans.",
+              sourceIds: ["acog-birth-spacing"],
+            },
+          ],
+        },
+      ],
+      questionsForProvider: [
+        {
+          question: "Which contraception options are safe for me right now, especially if I'm breastfeeding?",
+          rationale: "Timing after birth and feeding choices both affect which methods are recommended.",
+          sourceIds: ["cdc-mec", "acog-birth-spacing"],
+        },
+        {
+          question: "How soon could I get pregnant again, and what spacing do you recommend?",
+          rationale: "Fertility can return quickly, and spacing affects the plan.",
+          sourceIds: ["cdc-contraception-return", "acog-birth-spacing"],
+        },
+      ],
+      informationGaps: [
+        {
+          gap: "We don't know how long ago you gave birth or whether you're breastfeeding.",
+          whyItMatters: "Both determine which methods are appropriate and when.",
+        },
+        {
+          gap: "We don't know if or when you'd like another child.",
+          whyItMatters: "This shapes whether to choose short-term or longer-term contraception.",
+        },
+      ],
+      sources: resolve(["cdc-contraception-return", "cdc-mec", "acog-birth-spacing", "acog-postpartum"]),
+      disclaimer:
+        "HerNext is a navigation tool, not medical advice or diagnosis. It helps you prepare for the conversation with your healthcare provider, who knows your full history.",
     },
   },
 ];

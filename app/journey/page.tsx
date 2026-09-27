@@ -5,6 +5,7 @@ import Link from "next/link";
 import { TRANSITIONS, getTransition } from "@/lib/transitions";
 import type { Pathway, UserContext } from "@/lib/types";
 import PathwayView from "@/components/PathwayView";
+import ChatWidget from "@/components/ChatWidget";
 
 type Step = "select" | "details" | "loading" | "result";
 
@@ -410,6 +411,7 @@ export default function Journey() {
           </footer>
         </div>
       )}
+      <ChatWidget pathway={step === "result" ? pathway : null} transition={selected} />
     </main>
   );
 }
